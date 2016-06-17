@@ -69,6 +69,7 @@
     test_tracking_num();
 
     function tracking_info($tracking_num) {
+        global $has_error;
         $result = '';
         if ($has_error) {
             return $result;
@@ -82,6 +83,7 @@
         $html = curl_exec($ch);
         curl_close($ch);
         $dom = new DOMDocument();
+        libxml_use_internal_errors(true);
         $dom->loadHTML('<?xml encoding="utf-8" ?>'.$html);
         $count = 0;
         foreach($dom->getElementsByTagName('td') as $td) {
@@ -90,9 +92,12 @@
                 $s = trim($td->nodeValue);
                 //echo $s.'<br>';
                 $arr = preg_split("/[\s]+/", $s);
-                $len = count($arr);
+                //print_r($arr);
                 for ($i=0; $i<count($arr); $i++){
-                    $result .= '<td>'.$arr[$i].'</td>';
+                    print_r($arr[2]);
+                    if(!preg_match('/[\s]+/', $arr[$i])) {
+                        $result .= '<td>'.$arr[$i].'</td>';
+                    }
                 }
                 $result .= '</tr>';
             }
@@ -103,13 +108,13 @@
 
 ?>
 
-<h2 class='title'>三妞美国正品代购</h2>
+<h3 class='title'>三妞美国正品代购</h3>
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
     <div class='input'>
     <label>
      输入订单号：
     <input class='text' type='text' name= 'tracking-number' value="<?php echo $tracking_num;?>">
-    <input class='submit' type='submit' value='提 交'>
+    <input class='submit' type='submit' value='提交'>
     <p class="error"><?php echo $tracking_err;?></p>
     </label>
     </div>
@@ -123,7 +128,7 @@
             echo '<table>'.$table.'</table>';
         }
         else if($tracking_num != '' and !$has_error) {
-            echo 'Sorry！ 亲,目前检索不到亲的订单信息,请亲耐心等待！';
+            echo 'Sorry亲,目前检索不到亲的订单信息,请亲耐心等待！';
         }
     ?>
 </div>
